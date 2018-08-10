@@ -53,6 +53,8 @@ tasks.withType(Test) {
 }
 ```
 
+The solution was by chris_yones_yar and found here: https://discuss.gradle.org/t/show-stderr-for-failed-tests/8463/7
+
 ## What is the result?
 
 ```
