@@ -1,0 +1,39 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+}
+
+// Test-Logging
+project.test {
+    def outputCache = new LinkedList<String>()
+    
+    beforeTest { TestDescriptor td -> outputCache.clear() }    // clear everything right before the test starts
+    
+    onOutput { TestDescriptor td, TestOutputEvent toe ->       // when output is coming put it in the cache
+        outputCache.add(toe.getMessage())
+        while (outputCache.size() > 1000) outputCache.remove() // if we have more than 1000 lines -> drop first
+    }
+
+    /** after test -> decide what to print */
+    afterTest { TestDescriptor td, TestResult tr ->
+        if (tr.resultType == TestResult.ResultType.FAILURE && outputCache.size() > 0) {
+            println()
+            println(" Output of ${td.className}.${td.name}:")
+            outputCache.each { print(" > $it") }
+        }
+    }
+}
+
+tasks.withType(Test) {
+    reports.html.enabled = false
+    testLogging {
+        events /*'started',*/ 'passed', 'failed'
+        exceptionFormat = 'full'
+        afterSuite { desc, result -> if (!desc.parent) println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)" }
+    }
+}

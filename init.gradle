@@ -1,0 +1,26 @@
+gradle.useLogger(new CustomEventLogger())
+
+class CustomEventLogger extends BuildAdapter implements TaskExecutionListener, TaskActionListener {
+
+    public void beforeExecute(Task task) {
+        println "before execute: [$task.name]"
+    }
+
+    public void afterExecute(Task task, TaskState state) {
+        println "after execute: [$task.name]"
+    }
+
+    public void buildFinished(BuildResult result) {
+        println "build completed  " + result
+    }
+
+    @Override
+    void beforeActions(Task task) {
+        println("before action: " +task.name + " " + task.actions)
+    }
+
+    @Override
+    void afterActions(Task task) {
+        println("after action: " +task.name + " " + task.actions)
+    }
+}
